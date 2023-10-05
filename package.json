@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon server/index.js --ignore front",
-    "build": "npm run build --prefix front",
+    "build": "npm install --prefix front && npm run build --prefix front",
     "start": "node server/index.js"
   },
   "keywords": [],
