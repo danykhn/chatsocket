@@ -17,7 +17,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 
-app.use(express.static(resolve("frontend/dist")));
+app.use(express.static(resolve("front/dist")));
 let chatRoom = '';
 let allUsers = [];
 io.on("connection", (socket) => {
