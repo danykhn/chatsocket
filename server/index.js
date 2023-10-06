@@ -1,23 +1,41 @@
 import express from "express";
-import http from 'http'
+import http from "http";
+import morgan from "morgan";
 import { Server as SocketServer } from "socket.io";
-import { resolve } from 'path'
+import { resolve, dirname } from "path";
+
 import { PORT } from "./config.js";
+import cors from "cors";
 
-const app = express()
-const server = http.createServer(app)
-const io = new SocketServer(server)
+// Initializations
+const app = express();
+const server = http.createServer(app);
+const io = new SocketServer(server);
 
-app.use(express.static(resolve('front/dist')))
+// Middlewares
+app.use(cors());
+app.use(morgan("dev"));
+app.use(express.urlencoded({ extended: false }));
 
-io.on('connection', socket => {
-    console.log('client connect', socket.id)
-    socket.on('chatMensaje', (body) => {
-        socket.broadcast.emit('mensajeBroad', {
-            body,
-            from: socket.id.slice(6)
-        })
+app.use(express.static(resolve("frontend/dist")));
+let chatRoom = '';
+let allUsers = [];
+io.on("connection", (socket) => {
+    console.log(socket.id);
+    socket.on("message", (data) => {
+        console.log(data)
+        socket.broadcast.emit("recived_msg", data);
+    });
+
+    socket.on('join_room', (data) => {
+        const username = data
+        allUsers.push({ id: socket.id, user: username.user });
+        socket.emit('list_clientes', allUsers);
     })
-})
-server.listen(PORT)
-console.log('server on :', PORT)
+
+
+
+});
+
+server.listen(PORT);
+console.log(`server on port ${PORT}`);
